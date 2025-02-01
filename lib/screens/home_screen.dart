@@ -142,7 +142,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           width: 40,
           height: 40,
           child: CircleAvatar(
-            backgroundColor: Colors.orangeAccent.withOpacity(0.5),
+            backgroundColor: (element.getDate.isNotEmpty)
+                ? Colors.pinkAccent.withOpacity(0.5)
+                : Colors.orangeAccent.withOpacity(0.5),
             child: Text(
               station.stationName,
               style: const TextStyle(fontSize: 10, color: Colors.black),
