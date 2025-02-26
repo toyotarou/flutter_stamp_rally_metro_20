@@ -67,30 +67,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ///
   @override
   Widget build(BuildContext context) {
-    getNotReachTemple();
+    makeMinMaxLatLng();
 
     makeMarker();
 
     return Scaffold(
       body: SafeArea(
-        child: FlutterMap(
-          mapController: mapController,
-          options: MapOptions(
-            initialCenter: const LatLng(35.718532, 139.586639),
-            initialZoom: currentZoomEightTeen,
-            onPositionChanged: (MapCamera position, bool isMoving) {
-              if (isMoving) {
-                ref.read(appParamsControllerProvider.notifier).setCurrentZoom(zoom: position.zoom);
-              }
-            },
-          ),
-          children: <Widget>[
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              tileProvider: CachedTileProvider(),
-              userAgentPackageName: 'com.example.app',
+        child: Stack(
+          children: [
+            FlutterMap(
+              mapController: mapController,
+              options: MapOptions(
+                initialCenter: const LatLng(35.718532, 139.586639),
+                initialZoom: currentZoomEightTeen,
+                onPositionChanged: (MapCamera position, bool isMoving) {
+                  if (isMoving) {
+                    ref.read(appParamsControllerProvider.notifier).setCurrentZoom(zoom: position.zoom);
+                  }
+                },
+              ),
+              children: <Widget>[
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  tileProvider: CachedTileProvider(),
+                  userAgentPackageName: 'com.example.app',
+                ),
+                MarkerLayer(markers: markerList),
+              ],
             ),
-            MarkerLayer(markers: markerList),
+            if (isLoading) ...[const Center(child: CircularProgressIndicator())],
           ],
         ),
       ),
@@ -98,7 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   ///
-  void getNotReachTemple() {
+  void makeMinMaxLatLng() {
     final List<double> latList = <double>[];
     final List<double> lngList = <double>[];
 
@@ -127,13 +132,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   ///
   void makeMarker() {
-    final List<StampRallyMetro20Model> stampRallyMetro20List = ref.watch(stampRallyMetro20ControllerProvider
-        .select((StampRallyMetro20ControllerState value) => value.stampRallyMetro20List));
+    final List<StampRallyMetro20Model> stampRallyMetro20List = ref.watch(
+      stampRallyMetro20ControllerProvider
+          .select((StampRallyMetro20ControllerState value) => value.stampRallyMetro20List),
+    );
 
     final Map<int, StationModel> stationMap =
         ref.watch(stationControllerProvider.select((StationControllerState value) => value.stationMap));
 
+    Map<int, bool> map = {};
+
     for (final StampRallyMetro20Model element in stampRallyMetro20List) {
+      map[element.stationId] = false;
+
       final StationModel? station = stationMap[element.stationId];
 
       if (station != null) {
@@ -153,6 +164,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ));
       }
     }
+
+    Future(() => ref.read(appParamsControllerProvider.notifier).setStationStampFlagMap(map: map));
   }
 
   ///
