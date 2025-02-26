@@ -10,8 +10,8 @@ class AppParamsControllerState with _$AppParamsControllerState {
   const factory AppParamsControllerState({
     @Default(0) double currentZoom,
     @Default(5) int currentPaddingIndex,
-    @Default({}) Map<int, String> stationStampMap,
-    @Default({}) Map<int, bool> stationStampFlagMap,
+    @Default(<int, String>{}) Map<int, String> stationStampMap,
+    @Default(<int, bool>{}) Map<int, bool> stationStampFlagMap,
   }) = _AppParamsControllerState;
 }
 
@@ -20,7 +20,7 @@ class AppParamsController extends _$AppParamsController {
   ///
   @override
   AppParamsControllerState build() {
-    var map = <int, String>{
+    final Map<int, String> map = <int, String>{
       5960: 'metro_stamp_20_hanzoumon.png',
       5941: 'metro_stamp_20_higashiikebukuro.png',
       5866: 'metro_stamp_20_hounanchou.png',
@@ -54,7 +54,7 @@ class AppParamsController extends _$AppParamsController {
 
   ///
   void setStationStampFlag({required int id, required bool flag}) {
-    var map = {...state.stationStampFlagMap};
+    final Map<int, bool> map = <int, bool>{...state.stationStampFlagMap};
     map[id] = flag;
     state = state.copyWith(stationStampFlagMap: map);
   }

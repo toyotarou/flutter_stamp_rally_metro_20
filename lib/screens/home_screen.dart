@@ -5,9 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../controllers/app_params/app_params.dart';
-import '../controllers/stamp_rally_metro_20/stamp_rally_metro_20.dart';
-import '../controllers/station/station.dart';
+import '../controllers/controllers_mixin.dart';
 import '../extensions/extensions.dart';
 import '../models/stamp_rally_metro_20_model.dart';
 import '../models/station_model.dart';
@@ -20,7 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with ControllersMixin<HomeScreen> {
   List<double> latList = <double>[];
   List<double> lngList = <double>[];
 
@@ -46,9 +44,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
 
-    ref.read(stampRallyMetro20ControllerProvider.notifier).getAllStampRallyMetro20();
+    stampRallyMetro20ControllerNotifier.getAllStampRallyMetro20();
 
-    ref.read(stationControllerProvider.notifier).getAllStation();
+    stationControllerNotifier.getAllStation();
 
     super.initState();
 
@@ -74,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: Stack(
-          children: [
+          children: <Widget>[
             FlutterMap(
               mapController: mapController,
               options: MapOptions(
@@ -82,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 initialZoom: currentZoomEightTeen,
                 onPositionChanged: (MapCamera position, bool isMoving) {
                   if (isMoving) {
-                    ref.read(appParamsControllerProvider.notifier).setCurrentZoom(zoom: position.zoom);
+                    appParamNotifier.setCurrentZoom(zoom: position.zoom);
                   }
                 },
               ),
@@ -95,7 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 MarkerLayer(markers: markerList),
               ],
             ),
-            if (isLoading) ...[const Center(child: CircularProgressIndicator())],
+            if (isLoading) ...<Widget>[const Center(child: CircularProgressIndicator())],
           ],
         ),
       ),
@@ -107,14 +105,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final List<double> latList = <double>[];
     final List<double> lngList = <double>[];
 
-    final List<StampRallyMetro20Model> stampRallyMetro20List = ref.watch(stampRallyMetro20ControllerProvider
-        .select((StampRallyMetro20ControllerState value) => value.stampRallyMetro20List));
-
-    final Map<int, StationModel> stationMap =
-        ref.watch(stationControllerProvider.select((StationControllerState value) => value.stationMap));
-
-    for (final StampRallyMetro20Model element in stampRallyMetro20List) {
-      final StationModel? station = stationMap[element.stationId];
+    for (final StampRallyMetro20Model element in stampRallyMetro20ControllerState.stampRallyMetro20List) {
+      final StationModel? station = stationControllerState.stationMap[element.stationId];
 
       if (station != null) {
         latList.add(double.parse(station.lat));
@@ -132,22 +124,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   ///
   void makeMarker() {
-    final List<StampRallyMetro20Model> stampRallyMetro20List = ref.watch(
-      stampRallyMetro20ControllerProvider
-          .select((StampRallyMetro20ControllerState value) => value.stampRallyMetro20List),
-    );
 
-    final Map<int, StationModel> stationMap =
-        ref.watch(stationControllerProvider.select((StationControllerState value) => value.stationMap));
+    final Map<int, bool> map = <int, bool>{};
 
-    Map<int, bool> map = {};
-
-    for (final StampRallyMetro20Model element in stampRallyMetro20List) {
+    for (final StampRallyMetro20Model element in stampRallyMetro20ControllerState.stampRallyMetro20List) {
       map[element.stationId] = false;
 
-      final StationModel? station = stationMap[element.stationId];
+      final StationModel? station = stationControllerState.stationMap[element.stationId];
 
       if (station != null) {
+        final String? stamp = appParamState.stationStampMap[element.stationId];
+
+        final bool? flag = appParamState.stationStampFlagMap[element.stationId];
+
         markerList.add(Marker(
           point: LatLng(station.lat.toDouble(), station.lng.toDouble()),
           width: 40,
@@ -165,17 +154,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     }
 
-    Future(() => ref.read(appParamsControllerProvider.notifier).setStationStampFlagMap(map: map));
+    // ignore: always_specify_types
+    Future(() => appParamNotifier.setStationStampFlagMap(map: map));
   }
 
   ///
   void setDefaultBoundsMap() {
-    final int currentPaddingIndex =
-        ref.watch(appParamsControllerProvider.select((AppParamsControllerState value) => value.currentPaddingIndex));
-
     final LatLngBounds bounds = LatLngBounds.fromPoints(<LatLng>[LatLng(minLat, maxLng), LatLng(maxLat, minLng)]);
 
-    final CameraFit cameraFit = CameraFit.bounds(bounds: bounds, padding: EdgeInsets.all(currentPaddingIndex * 10));
+    final CameraFit cameraFit =
+        CameraFit.bounds(bounds: bounds, padding: EdgeInsets.all(appParamState.currentPaddingIndex * 10));
 
     mapController.fitCamera(cameraFit);
 
@@ -186,7 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     setState(() => currentZoom = newZoom);
 
-    ref.read(appParamsControllerProvider.notifier).setCurrentZoom(zoom: newZoom);
+    appParamNotifier.setCurrentZoom(zoom: newZoom);
 
     getBoundsZoomValue = true;
   }
