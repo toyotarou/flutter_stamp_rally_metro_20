@@ -10,6 +10,8 @@ import '../extensions/extensions.dart';
 import '../models/stamp_rally_metro_20_model.dart';
 import '../models/station_model.dart';
 import '../utilities/tile_provider.dart';
+import 'components/stamp_display_alert.dart';
+import 'parts/stamp_rally_dialog.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -69,6 +71,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ControllersMixin<H
 
     makeMarker();
 
+    final List<String> dateList = <String>[];
+
+    for (final StampRallyMetro20Model element in stampRallyMetro20ControllerState.stampRallyMetro20List) {
+      if (!dateList.contains(element.getDate)) {
+        dateList.add(element.getDate);
+      }
+    }
+
+    dateList.sort((String a, String b) => a.compareTo(b));
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -93,6 +105,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ControllersMixin<H
                 MarkerLayer(markers: markerList),
               ],
             ),
+            if (!isLoading) ...<Widget>[
+              Positioned(
+                top: 5,
+                right: 5,
+                left: 5,
+                child: Column(
+                  children: <Widget>[
+                    Image.asset('assets/images/metro_20_stamp_rally_title.png'),
+                    Container(
+                      width: context.screenSize.width,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            children: dateList.map((String e) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
+                                child: GestureDetector(
+                                  onTap: () => appParamNotifier.setSelectedGetDate(date: e),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.blueAccent.withOpacity(0.3),
+                                    child: DefaultTextStyle(
+                                      style: const TextStyle(fontSize: 12),
+                                      child: Column(
+                                        children: <Widget>[
+                                          const SizedBox(height: 5),
+                                          Text(e.split('-')[0]),
+                                          Text('${e.split('-')[1]}-${e.split('-')[2]}'),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              IconButton(
+                                  onPressed: () => StampRallyDialog(
+                                        context: context,
+                                        widget: const StampDisplayAlert(stampDisp: false),
+                                        paddingTop: context.screenSize.height * 0.4,
+                                      ),
+                                  icon: const Icon(Icons.ac_unit, color: Colors.white)),
+                              IconButton(
+                                onPressed: () => appParamNotifier.setSelectedGetDate(date: ''),
+                                icon: const Icon(Icons.close, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             if (isLoading) ...<Widget>[const Center(child: CircularProgressIndicator())],
           ],
         ),
@@ -124,7 +199,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ControllersMixin<H
 
   ///
   void makeMarker() {
-
     final Map<int, bool> map = <int, bool>{};
 
     for (final StampRallyMetro20Model element in stampRallyMetro20ControllerState.stampRallyMetro20List) {
@@ -133,21 +207,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ControllersMixin<H
       final StationModel? station = stationControllerState.stationMap[element.stationId];
 
       if (station != null) {
-        final String? stamp = appParamState.stationStampMap[element.stationId];
-
-        final bool? flag = appParamState.stationStampFlagMap[element.stationId];
-
         markerList.add(Marker(
           point: LatLng(station.lat.toDouble(), station.lng.toDouble()),
           width: 40,
           height: 40,
-          child: CircleAvatar(
-            backgroundColor: (element.getDate.isNotEmpty)
-                ? Colors.pinkAccent.withOpacity(0.5)
-                : Colors.orangeAccent.withOpacity(0.5),
-            child: Text(
-              station.stationName,
-              style: const TextStyle(fontSize: 10, color: Colors.black),
+          child: GestureDetector(
+            onTap: () {
+              StampRallyDialog(
+                context: context,
+                widget: StampDisplayAlert(stampRallyMetro20Model: element, stampDisp: true),
+                paddingTop: context.screenSize.height * 0.4,
+              );
+            },
+            child: CircleAvatar(
+              backgroundColor: (element.getDate == appParamState.selectedGetDate)
+                  ? Colors.blueAccent.withOpacity(0.5)
+                  : (element.getDate.isNotEmpty)
+                      ? Colors.pinkAccent.withOpacity(0.5)
+                      : Colors.orangeAccent.withOpacity(0.5),
+              child: Text(
+                station.stationName,
+                style: const TextStyle(fontSize: 10, color: Colors.white),
+              ),
             ),
           ),
         ));

@@ -20,6 +20,7 @@ mixin _$AppParamsControllerState {
   int get currentPaddingIndex => throw _privateConstructorUsedError;
   Map<int, String> get stationStampMap => throw _privateConstructorUsedError;
   Map<int, bool> get stationStampFlagMap => throw _privateConstructorUsedError;
+  String get selectedGetDate => throw _privateConstructorUsedError;
 
   /// Create a copy of AppParamsControllerState
   /// with the given fields replaced by the non-null parameter values.
@@ -38,7 +39,8 @@ abstract class $AppParamsControllerStateCopyWith<$Res> {
       {double currentZoom,
       int currentPaddingIndex,
       Map<int, String> stationStampMap,
-      Map<int, bool> stationStampFlagMap});
+      Map<int, bool> stationStampFlagMap,
+      String selectedGetDate});
 }
 
 /// @nodoc
@@ -61,6 +63,7 @@ class _$AppParamsControllerStateCopyWithImpl<$Res,
     Object? currentPaddingIndex = null,
     Object? stationStampMap = null,
     Object? stationStampFlagMap = null,
+    Object? selectedGetDate = null,
   }) {
     return _then(_value.copyWith(
       currentZoom: null == currentZoom
@@ -79,6 +82,10 @@ class _$AppParamsControllerStateCopyWithImpl<$Res,
           ? _value.stationStampFlagMap
           : stationStampFlagMap // ignore: cast_nullable_to_non_nullable
               as Map<int, bool>,
+      selectedGetDate: null == selectedGetDate
+          ? _value.selectedGetDate
+          : selectedGetDate // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -96,7 +103,8 @@ abstract class _$$AppParamsControllerStateImplCopyWith<$Res>
       {double currentZoom,
       int currentPaddingIndex,
       Map<int, String> stationStampMap,
-      Map<int, bool> stationStampFlagMap});
+      Map<int, bool> stationStampFlagMap,
+      String selectedGetDate});
 }
 
 /// @nodoc
@@ -118,6 +126,7 @@ class __$$AppParamsControllerStateImplCopyWithImpl<$Res>
     Object? currentPaddingIndex = null,
     Object? stationStampMap = null,
     Object? stationStampFlagMap = null,
+    Object? selectedGetDate = null,
   }) {
     return _then(_$AppParamsControllerStateImpl(
       currentZoom: null == currentZoom
@@ -136,6 +145,10 @@ class __$$AppParamsControllerStateImplCopyWithImpl<$Res>
           ? _value._stationStampFlagMap
           : stationStampFlagMap // ignore: cast_nullable_to_non_nullable
               as Map<int, bool>,
+      selectedGetDate: null == selectedGetDate
+          ? _value.selectedGetDate
+          : selectedGetDate // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -146,8 +159,9 @@ class _$AppParamsControllerStateImpl implements _AppParamsControllerState {
   const _$AppParamsControllerStateImpl(
       {this.currentZoom = 0,
       this.currentPaddingIndex = 5,
-      final Map<int, String> stationStampMap = const {},
-      final Map<int, bool> stationStampFlagMap = const {}})
+      final Map<int, String> stationStampMap = const <int, String>{},
+      final Map<int, bool> stationStampFlagMap = const <int, bool>{},
+      this.selectedGetDate = ''})
       : _stationStampMap = stationStampMap,
         _stationStampFlagMap = stationStampFlagMap;
 
@@ -177,8 +191,12 @@ class _$AppParamsControllerStateImpl implements _AppParamsControllerState {
   }
 
   @override
+  @JsonKey()
+  final String selectedGetDate;
+
+  @override
   String toString() {
-    return 'AppParamsControllerState(currentZoom: $currentZoom, currentPaddingIndex: $currentPaddingIndex, stationStampMap: $stationStampMap, stationStampFlagMap: $stationStampFlagMap)';
+    return 'AppParamsControllerState(currentZoom: $currentZoom, currentPaddingIndex: $currentPaddingIndex, stationStampMap: $stationStampMap, stationStampFlagMap: $stationStampFlagMap, selectedGetDate: $selectedGetDate)';
   }
 
   @override
@@ -193,7 +211,9 @@ class _$AppParamsControllerStateImpl implements _AppParamsControllerState {
             const DeepCollectionEquality()
                 .equals(other._stationStampMap, _stationStampMap) &&
             const DeepCollectionEquality()
-                .equals(other._stationStampFlagMap, _stationStampFlagMap));
+                .equals(other._stationStampFlagMap, _stationStampFlagMap) &&
+            (identical(other.selectedGetDate, selectedGetDate) ||
+                other.selectedGetDate == selectedGetDate));
   }
 
   @override
@@ -202,7 +222,8 @@ class _$AppParamsControllerStateImpl implements _AppParamsControllerState {
       currentZoom,
       currentPaddingIndex,
       const DeepCollectionEquality().hash(_stationStampMap),
-      const DeepCollectionEquality().hash(_stationStampFlagMap));
+      const DeepCollectionEquality().hash(_stationStampFlagMap),
+      selectedGetDate);
 
   /// Create a copy of AppParamsControllerState
   /// with the given fields replaced by the non-null parameter values.
@@ -216,11 +237,11 @@ class _$AppParamsControllerStateImpl implements _AppParamsControllerState {
 
 abstract class _AppParamsControllerState implements AppParamsControllerState {
   const factory _AppParamsControllerState(
-          {final double currentZoom,
-          final int currentPaddingIndex,
-          final Map<int, String> stationStampMap,
-          final Map<int, bool> stationStampFlagMap}) =
-      _$AppParamsControllerStateImpl;
+      {final double currentZoom,
+      final int currentPaddingIndex,
+      final Map<int, String> stationStampMap,
+      final Map<int, bool> stationStampFlagMap,
+      final String selectedGetDate}) = _$AppParamsControllerStateImpl;
 
   @override
   double get currentZoom;
@@ -230,6 +251,8 @@ abstract class _AppParamsControllerState implements AppParamsControllerState {
   Map<int, String> get stationStampMap;
   @override
   Map<int, bool> get stationStampFlagMap;
+  @override
+  String get selectedGetDate;
 
   /// Create a copy of AppParamsControllerState
   /// with the given fields replaced by the non-null parameter values.

@@ -12,6 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      themeMode: ThemeMode.dark,
+      title: 'Stamp Rally Metro 20',
+      debugShowCheckedModeBanner: false,
       home: HomeScreen(),
     );
   }

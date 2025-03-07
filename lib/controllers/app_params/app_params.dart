@@ -12,6 +12,7 @@ class AppParamsControllerState with _$AppParamsControllerState {
     @Default(5) int currentPaddingIndex,
     @Default(<int, String>{}) Map<int, String> stationStampMap,
     @Default(<int, bool>{}) Map<int, bool> stationStampFlagMap,
+    @Default('') String selectedGetDate,
   }) = _AppParamsControllerState;
 }
 
@@ -58,4 +59,7 @@ class AppParamsController extends _$AppParamsController {
     map[id] = flag;
     state = state.copyWith(stationStampFlagMap: map);
   }
+
+  ///
+  void setSelectedGetDate({required String date}) => state = state.copyWith(selectedGetDate: date);
 }
